@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: mysql
-        image: your-repo/db:latest
+        image: 047719630685.dkr.ecr.us-east-1.amazonaws.com/db-image:latest
         env:
         - name: MYSQL_ROOT_PASSWORD
           value: "rootpassword"
