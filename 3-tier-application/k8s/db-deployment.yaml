@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: db
-        image: mysql:5.7
+        image: 047719630685.dkr.ecr.us-east-1.amazonaws.com/db-image:latest
         command: [ "sh", "-c", "sleep 20 && docker-entrypoint.sh mysqld" ]
         env:
         - name: MYSQL_ROOT_PASSWORD
