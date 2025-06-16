@@ -1,83 +1,61 @@
-from flask import Flask, render_template
-import pymysql
-import config
-
-app = Flask(__name__)
-
-def get_db_connection():
-    return pymysql.connect(
-        host=config.DB_HOST,
-        user=config.DB_USER,
-        password=config.DB_PASSWORD,
-        database=config.DB_NAME
-    )
-
-@app.route('/')
-def index():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, name FROM users")
-    users = cursor.fetchall()
-    conn.close()
-    return render_template('index.html', users=users)
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
-
-# import time
+# from flask import Flask, render_template
 # import pymysql
-# from flask import Flask, request, redirect, render_template_string
+# import config
 
 # app = Flask(__name__)
 
-# # Wait until the DB is reachable
-# for i in range(30):
-#     try:
-#         db = pymysql.connect(
-#             host='db',
-#             user='root',
-#             password='rootpassword',
-#             database='userdb'
-#         )
-#         print("✅ Connected to MySQL")
-#         break
-#     except pymysql.err.OperationalError as e:
-#         print(f"⏳ Waiting for DB... ({i+1}/30)")
-#         time.sleep(2)
-# else:
-#     raise Exception("❌ Could not connect to DB after 30 attempts")
+# def get_db_connection():
+#     return pymysql.connect(
+#         host=config.DB_HOST,
+#         user=config.DB_USER,
+#         password=config.DB_PASSWORD,
+#         database=config.DB_NAME
+#     )
 
-# # HTML page with form and data list
-# HTML = """
-# <!DOCTYPE html>
-# <html>
-# <head><title>User List</title></head>
-# <body>
-#   <h1>User List</h1>
-#   <form method="POST">
-#     <input type="text" name="name" placeholder="Enter name" required>
-#     <button type="submit">Add</button>
-#   </form>
-#   <ul>
-#   {% for user in users %}
-#     <li>ID: {{ user[0] }}, Name: {{ user[1] }}</li>
-#   {% endfor %}
-#   </ul>
-# </body>
-# </html>
-# """
-
-# @app.route('/', methods=['GET', 'POST'])
+# @app.route('/')
 # def index():
-#     cursor = db.cursor()
-#     if request.method == 'POST':
-#         name = request.form['name']
-#         cursor.execute("INSERT INTO users (name) VALUES (%s)", (name,))
-#         db.commit()
-#         return redirect('/')
-#     cursor.execute("SELECT * FROM users")
+#     conn = get_db_connection()
+#     cursor = conn.cursor()
+#     cursor.execute("SELECT id, name FROM users")
 #     users = cursor.fetchall()
-#     return render_template_string(HTML, users=users)
+#     conn.close()
+#     return render_template('index.html', users=users)
 
 # if __name__ == '__main__':
 #     app.run(host='0.0.0.0', port=5000)
+
+from flask import Flask, request, jsonify
+import mysql.connector
+import os
+
+app = Flask(__name__)
+
+DB_HOST = os.environ.get("DB_HOST", "db")
+DB_USER = os.environ.get("DB_USER", "root")
+DB_PASS = os.environ.get("DB_PASS", "root")
+DB_NAME = os.environ.get("DB_NAME", "userdb")
+
+@app.route("/users", methods=["GET"])
+def get_users():
+    conn = mysql.connector.connect(host=DB_HOST, user=DB_USER, password=DB_PASS, database=DB_NAME)
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM users")
+    users = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return jsonify(users)
+
+@app.route("/users", methods=["POST"])
+def add_user():
+    data = request.get_json()
+    name, email = data["name"], data["email"]
+    conn = mysql.connector.connect(host=DB_HOST, user=DB_USER, password=DB_PASS, database=DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO users (name, email) VALUES (%s, %s)", (name, email))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return {"message": "User added successfully"}, 201
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
