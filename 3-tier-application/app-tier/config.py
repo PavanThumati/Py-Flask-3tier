@@ -1,0 +1,8 @@
+# DB_HOST = 'your-rds-endpoint.amazonaws.com'
+# DB_USER = 'your_db_user'
+# DB_PASSWORD = 'your_db_password'
+# DB_NAME = 'your_db_name'
+DB_HOST = 'db'
+DB_USER = 'root'
+DB_PASSWORD = 'rootpassword'
+DB_NAME = 'userdb'
