@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: flask
-        image: your-repo/app:latest
+        image: 047719630685.dkr.ecr.us-east-1.amazonaws.com/app-tier-image:latest
         ports:
         - containerPort: 80
 ---
