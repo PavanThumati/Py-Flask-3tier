@@ -6,17 +6,26 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: nginx
+      app: web
   template:
     metadata:
       labels:
-        app: nginx
+        app: web
     spec:
       containers:
-      - name: nginx
-        image: 047719630685.dkr.ecr.us-east-1.amazonaws.com/web-tier-image:latest
-        ports:
-        - containerPort: 80
+        - name: web
+          image: 047719630685.dkr.ecr.us-east-1.amazonaws.com/web-tier-image:latest
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: web-nginx-config
+
 ---
 apiVersion: v1
 kind: Service
@@ -24,7 +33,10 @@ metadata:
   name: web
 spec:
   selector:
-    app: nginx
+    app: web
   ports:
-    - port: 80
+    - protocol: TCP
+      port: 80
+      targetPort: 80
   type: LoadBalancer
+
