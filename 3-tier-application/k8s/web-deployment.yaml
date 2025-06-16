@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: your-repo/web:latest
+        image: 047719630685.dkr.ecr.us-east-1.amazonaws.com/web-tier-image:latest
         ports:
         - containerPort: 80
 ---
