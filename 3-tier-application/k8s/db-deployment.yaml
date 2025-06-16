@@ -13,15 +13,19 @@ spec:
         app: db
     spec:
       containers:
-      - name: mysql
-        image: 047719630685.dkr.ecr.us-east-1.amazonaws.com/db-image:latest
-        env:
-        - name: MYSQL_ROOT_PASSWORD
-          value: "rootpassword"
-        - name: MYSQL_DATABASE
-          value: "userdb"
-        ports:
-        - containerPort: 3306
+        - name: mysql
+          image: mysql:5.7
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: rootpass
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-persistent-storage
+          emptyDir: {}  # Use a PVC in prod
 ---
 apiVersion: v1
 kind: Service
@@ -31,8 +35,5 @@ spec:
   selector:
     app: db
   ports:
-    - protocol: TCP
-      port: 3306
-      targetPort: 3306
-  clusterIP: None  # or remove this line to let K8s assign a proper IP
-
+    - port: 3306
+  clusterIP: None
