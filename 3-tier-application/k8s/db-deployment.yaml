@@ -31,5 +31,8 @@ spec:
   selector:
     app: db
   ports:
-    - port: 3306
-  clusterIP: None
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+  clusterIP: None  # or remove this line to let K8s assign a proper IP
+
