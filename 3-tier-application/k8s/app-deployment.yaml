@@ -6,17 +6,26 @@ spec:
   replicas: 2
   selector:
     matchLabels:
-      app: flask
+      app: app
   template:
     metadata:
       labels:
-        app: flask
+        app: app
     spec:
       containers:
-      - name: flask
-        image: 047719630685.dkr.ecr.us-east-1.amazonaws.com/app-tier-image:latest
-        ports:
-        - containerPort: 5000
+        - name: app
+          image: 047719630685.dkr.ecr.us-east-1.amazonaws.com/app-tier-image:latest  # Replace with your image
+          ports:
+            - containerPort: 5000
+          env:
+            - name: DB_HOST
+              value: db
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_USER
+              value: root
+            - name: DB_PASSWORD
+              value: rootpass
 ---
 apiVersion: v1
 kind: Service
@@ -24,7 +33,7 @@ metadata:
   name: app
 spec:
   selector:
-    app: flask
+    app: app
   ports:
     - port: 5000
       targetPort: 5000
