@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-app-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-app
+  template:
+    metadata:
+      labels:
+        app: user-app
+    spec:
+      containers:
+      - name: user-app-container
+        image: 047719630685.dkr.ecr.us-east-1.amazonaws.com/app-tier-image:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: DB_HOST
+          value: "database-3.cotwo8y6mnk3.us-east-1.rds.amazonaws.com"
+        - name: DB_USER
+          value: "admin"
+        - name: DB_PASSWORD
+          value: "adminadmin"
+        - name: DB_NAME
+          value: "userdb"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-app-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: user-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
